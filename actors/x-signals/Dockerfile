@@ -3,7 +3,7 @@ FROM apify/actor-node-playwright-chrome:20
 
 # Copy package files and install deps
 COPY package*.json ./
-RUN npm install --include=dev --quiet
+RUN npm install
 
 # Copy source and compile
 COPY tsconfig.json ./

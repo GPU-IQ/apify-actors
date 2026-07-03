@@ -1,7 +1,7 @@
 FROM apify/actor-node-playwright-chrome:20
 
 COPY package*.json ./
-RUN npm install --include=dev --quiet
+RUN npm install
 
 COPY tsconfig.json ./
 COPY src ./src
