@@ -28,6 +28,7 @@
     "maxPostsPerHandle": {
       "title": "Max posts per handle",
       "type": "integer",
+      "description": "Maximum number of recent posts to fetch per handle.",
       "default": 12,
       "minimum": 1,
       "maximum": 50
@@ -35,6 +36,7 @@
     "maxHashtagResults": {
       "title": "Max hashtag results",
       "type": "integer",
+      "description": "Maximum posts to collect per hashtag search.",
       "default": 30,
       "minimum": 1,
       "maximum": 100
@@ -48,6 +50,7 @@
     "followerBaselinePath": {
       "title": "Follower baseline (KV key)",
       "type": "string",
+      "description": "Key-value store key holding previous follower counts for delta calculation.",
       "default": "ig-follower-baseline"
     }
   },
