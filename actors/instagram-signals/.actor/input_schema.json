@@ -20,6 +20,7 @@
     "mode": {
       "title": "Mode",
       "type": "string",
+      "description": "account_tracking scrapes listed handles. hashtag_search prospects via hashtags.",
       "editor": "select",
       "enum": ["account_tracking", "hashtag_search", "both"],
       "default": "both"
