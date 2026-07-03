@@ -1,0 +1,7 @@
+{
+  "handles": ["openai", "mistralai", "AnthropicAI", "GoogleDeepMind"],
+  "keywords": ["GPU cluster inference", "LLM inference at scale", "vLLM production"],
+  "mode": "both",
+  "maxPostsPerHandle": 10,
+  "maxSearchResults": 20
+}

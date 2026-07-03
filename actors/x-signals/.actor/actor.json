@@ -1,0 +1,11 @@
+{
+  "actorSpecification": 1,
+  "name": "gpuiq-x-signals",
+  "title": "GPU IQ X Signals",
+  "description": "Tracks X (Twitter) handles and keywords to surface product launches, engagement spikes, follower growth, and net-new prospects for GPU IQ.",
+  "version": "0.1",
+  "buildTag": "latest",
+  "dockerfile": "./Dockerfile",
+  "readme": "./README.md",
+  "input": "./input_schema.json"
+}

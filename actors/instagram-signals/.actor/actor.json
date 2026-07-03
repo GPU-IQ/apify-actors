@@ -1,0 +1,11 @@
+{
+  "actorSpecification": 1,
+  "name": "gpuiq-instagram-signals",
+  "title": "GPU IQ Instagram Signals",
+  "description": "Tracks Instagram brand handles to surface product launches, engagement spikes, and follower growth for GPU IQ.",
+  "version": "0.1",
+  "buildTag": "latest",
+  "dockerfile": "./Dockerfile",
+  "readme": "./README.md",
+  "input": "./input_schema.json"
+}

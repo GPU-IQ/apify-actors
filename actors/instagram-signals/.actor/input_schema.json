@@ -1,0 +1,54 @@
+{
+  "title": "Instagram Signals Input",
+  "type": "object",
+  "schemaVersion": 1,
+  "properties": {
+    "handles": {
+      "title": "Handles to track",
+      "type": "array",
+      "description": "Instagram handles to monitor (without @).",
+      "editor": "stringList",
+      "default": []
+    },
+    "hashtags": {
+      "title": "Hashtags",
+      "type": "array",
+      "description": "Hashtags for prospecting mode (without #).",
+      "editor": "stringList",
+      "default": ["aiinfrastructure", "gpucomputing", "llm", "machinelearning"]
+    },
+    "mode": {
+      "title": "Mode",
+      "type": "string",
+      "editor": "select",
+      "enum": ["account_tracking", "hashtag_search", "both"],
+      "default": "both"
+    },
+    "maxPostsPerHandle": {
+      "title": "Max posts per handle",
+      "type": "integer",
+      "default": 12,
+      "minimum": 1,
+      "maximum": 50
+    },
+    "maxHashtagResults": {
+      "title": "Max hashtag results",
+      "type": "integer",
+      "default": 30,
+      "minimum": 1,
+      "maximum": 100
+    },
+    "sessionUsername": {
+      "title": "Session account username",
+      "type": "string",
+      "description": "Instagram username for the dedicated session account. Store credentials in Actor environment variables, not here.",
+      "default": ""
+    },
+    "followerBaselinePath": {
+      "title": "Follower baseline (KV key)",
+      "type": "string",
+      "default": "ig-follower-baseline"
+    }
+  },
+  "required": []
+}

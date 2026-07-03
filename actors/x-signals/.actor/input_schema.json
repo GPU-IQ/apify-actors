@@ -1,0 +1,59 @@
+{
+  "title": "X Signals Input",
+  "type": "object",
+  "schemaVersion": 1,
+  "properties": {
+    "handles": {
+      "title": "Handles to track",
+      "type": "array",
+      "description": "X handles to monitor for account_tracking mode (without @).",
+      "editor": "stringList",
+      "default": []
+    },
+    "keywords": {
+      "title": "Keywords",
+      "type": "array",
+      "description": "Keywords or phrases for keyword_search prospecting mode.",
+      "editor": "stringList",
+      "default": [
+        "GPU cluster inference",
+        "LLM inference at scale",
+        "running our own models",
+        "self-hosted AI",
+        "vLLM production",
+        "AI infrastructure"
+      ]
+    },
+    "mode": {
+      "title": "Mode",
+      "type": "string",
+      "description": "account_tracking scrapes listed handles. keyword_search prospects via keywords.",
+      "editor": "select",
+      "enum": ["account_tracking", "keyword_search", "both"],
+      "default": "both"
+    },
+    "maxPostsPerHandle": {
+      "title": "Max posts per handle",
+      "type": "integer",
+      "description": "Maximum number of recent posts to fetch per handle.",
+      "default": 25,
+      "minimum": 1,
+      "maximum": 100
+    },
+    "maxSearchResults": {
+      "title": "Max keyword search results",
+      "type": "integer",
+      "description": "Maximum posts to collect per keyword search.",
+      "default": 50,
+      "minimum": 1,
+      "maximum": 200
+    },
+    "followerBaselinePath": {
+      "title": "Follower baseline (KV key)",
+      "type": "string",
+      "description": "Key-value store key holding previous follower counts for delta calculation. Leave blank to skip delta.",
+      "default": "follower-baseline"
+    }
+  },
+  "required": []
+}

@@ -1,0 +1,7 @@
+{
+  "handles": ["openai", "meta", "google"],
+  "hashtags": ["aiinfrastructure", "gpucomputing", "llm"],
+  "mode": "both",
+  "maxPostsPerHandle": 6,
+  "maxHashtagResults": 15
+}

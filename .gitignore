@@ -1,0 +1,5 @@
+node_modules/
+dist/
+.apify_storage/
+.env
+*.local
