@@ -1,16 +1,9 @@
-# Apify base image with Node 20 + Playwright + Chromium
 FROM apify/actor-node-playwright-chrome:20
 
-# Copy package files and install deps
-COPY package*.json ./
-RUN npm install
+COPY --chown=myuser package*.json ./
 
-# Copy source and compile
-COPY tsconfig.json ./
-COPY src ./src
-RUN npm run build
+RUN npm install --only=prod
 
-# Remove dev dependencies after build
-RUN npm prune --production
+COPY --chown=myuser dist ./dist
 
 CMD npm start

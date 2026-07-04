@@ -8,7 +8,7 @@
  * layout changes.
  */
 
-import type { Page, Response } from 'playwright';
+import type { Page, Response } from 'playwright-core';
 import type { XPost, XProfile } from './types.js';
 
 // ── GraphQL response parsers ──────────────────────────────────────────────────
@@ -67,7 +67,7 @@ export function parseTweetsFromGraphQL(data: unknown): XPost[] {
   }
 }
 
-export function parseSearchResultsFromGraphQL(data: unknown): XPost[] {
+export function parseSearchResultsFromGraphQL(data: unknown): (XPost & { authorHandle: string; authorName: string })[] {
   try {
     const instructions =
       (data as any)?.data?.search_by_raw_query?.search_timeline?.timeline?.instructions ?? [];

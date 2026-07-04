@@ -1,12 +1,9 @@
 FROM apify/actor-node-playwright-chrome:20
 
-COPY package*.json ./
-RUN npm install
+COPY --chown=myuser package*.json ./
 
-COPY tsconfig.json ./
-COPY src ./src
-RUN npm run build
+RUN npm install --only=prod
 
-RUN npm prune --production
+COPY --chown=myuser dist ./dist
 
 CMD npm start

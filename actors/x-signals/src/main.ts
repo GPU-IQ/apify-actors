@@ -143,7 +143,7 @@ const crawler = new PlaywrightCrawler({
 });
 
 // Build request list
-const requests: Parameters<typeof crawler.run>[0] = [];
+const requests: { url: string; userData: Record<string, unknown> }[] = [];
 
 if (mode === 'account_tracking' || mode === 'both') {
   for (const handle of handles) {

@@ -12,7 +12,7 @@
  * session. Sessions are retired automatically if Instagram challenges them.
  */
 
-import type { Page, Response } from 'playwright';
+import type { Page, Response } from 'playwright-core';
 import type { IgPost, IgProfile } from './types.js';
 
 // ── API response parsers ──────────────────────────────────────────────────────
@@ -146,7 +146,7 @@ export async function scrapeProfile(
     try {
       const ldJson = await page.$eval(
         'script[type="application/ld+json"]',
-        (el) => JSON.parse(el.textContent ?? '{}'),
+        (el: HTMLScriptElement) => JSON.parse(el.textContent ?? '{}'),
       );
       if (ldJson?.author?.name) {
         profile = {

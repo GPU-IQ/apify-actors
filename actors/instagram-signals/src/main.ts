@@ -13,6 +13,7 @@
 
 import { Actor, KeyValueStore } from 'apify';
 import { PlaywrightCrawler } from 'crawlee';
+import type { Page } from 'playwright-core';
 import type { Input, HandleResult, HashtagResult } from './types.js';
 import { classifyHandle, averageEngagement } from './signals.js';
 import { scrapeProfile, scrapeHashtag, loginIfNeeded } from './router.js';
@@ -56,11 +57,11 @@ const crawler = new PlaywrightCrawler({
   },
 
   // Log in on the first request of each new session
-  async preNavigationHooks: [
-    async ({ page, session }) => {
-      if (session && !(session as any).__igLoggedIn) {
-        const ok = await loginIfNeeded(page);
-        if (ok) (session as any).__igLoggedIn = true;
+  preNavigationHooks: [
+    async (ctx: { page: Page; session?: unknown; [key: string]: unknown }) => {
+      if (ctx.session && !(ctx.session as any).__igLoggedIn) {
+        const ok = await loginIfNeeded(ctx.page);
+        if (ok) (ctx.session as any).__igLoggedIn = true;
       }
     },
   ],
@@ -142,7 +143,7 @@ const crawler = new PlaywrightCrawler({
   },
 });
 
-const requests: Parameters<typeof crawler.run>[0] = [];
+const requests: { url: string; userData: Record<string, unknown> }[] = [];
 
 if (mode === 'account_tracking' || mode === 'both') {
   for (const handle of handles) {
