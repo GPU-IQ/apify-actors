@@ -24,49 +24,8 @@ const proxyConfiguration = await Actor.createProxyConfiguration({
     groups: ['RESIDENTIAL'],
     countryCode: 'US',
 });
-// ── Pre-login: open a standalone browser page, log in, persist cookies ──────
-// Do this BEFORE starting the crawler so Crawlee's navigation management
-// doesn't conflict with navigating to the login page inside a hook.
 const igUsername = process.env.INSTAGRAM_USERNAME;
 const igPassword = process.env.INSTAGRAM_PASSWORD;
-if (igUsername && igPassword) {
-    const { chromium } = await import('playwright');
-    const browser = await chromium.launch({
-        headless: true,
-        args: ['--disable-blink-features=AutomationControlled', '--no-sandbox'],
-    });
-    const page = await browser.newPage();
-    try {
-        await page.goto('https://www.instagram.com/accounts/login/', {
-            waitUntil: 'domcontentloaded',
-            timeout: 30_000,
-        });
-        // Dismiss cookie/consent dialog — try common selectors
-        for (const sel of [
-            'button:has-text("Allow all cookies")',
-            'button:has-text("Accept all")',
-            'button:has-text("Allow essential and optional cookies")',
-            '[data-cookiebanner="accept_button"]',
-        ]) {
-            try {
-                await page.locator(sel).first().click({ timeout: 4_000 });
-                break;
-            }
-            catch { /* try next */ }
-        }
-        // Wait for and fill login form
-        await page.waitForSelector('input[name="username"]', { timeout: 20_000 });
-        await page.fill('input[name="username"]', igUsername);
-        await page.fill('input[name="password"]', igPassword);
-        await page.click('button[type="submit"]');
-        await page.waitForURL(url => !url.toString().includes('/accounts/login'), { timeout: 25_000 }).catch(() => { });
-        console.log('[login] Instagram login completed');
-    }
-    catch (err) {
-        console.warn('[login] Instagram pre-login failed:', err.message);
-    }
-    await browser.close();
-}
 const crawler = new PlaywrightCrawler({
     proxyConfiguration,
     useSessionPool: true,
@@ -82,6 +41,39 @@ const crawler = new PlaywrightCrawler({
     },
     async requestHandler({ page, request, log }) {
         const { type, handle, hashtag } = request.userData;
+        // ── Login request — handled first so session cookies persist ──────────────
+        if (type === 'login') {
+            log.info('Attempting Instagram login');
+            await page.goto('https://www.instagram.com/accounts/login/', {
+                waitUntil: 'domcontentloaded',
+                timeout: 30_000,
+            });
+            // Dismiss cookie/consent dialog
+            for (const sel of [
+                'button:has-text("Allow all cookies")',
+                'button:has-text("Accept all")',
+                'button:has-text("Allow essential and optional cookies")',
+                '[data-cookiebanner="accept_button"]',
+            ]) {
+                try {
+                    await page.locator(sel).first().click({ timeout: 4_000 });
+                    break;
+                }
+                catch { /* try next */ }
+            }
+            try {
+                await page.waitForSelector('input[name="username"]', { timeout: 20_000 });
+                await page.fill('input[name="username"]', igUsername);
+                await page.fill('input[name="password"]', igPassword);
+                await page.click('button[type="submit"]');
+                await page.waitForURL(url => !url.toString().includes('/accounts/login'), { timeout: 25_000 }).catch(() => { });
+                log.info('Instagram login completed');
+            }
+            catch (err) {
+                log.warning(`Instagram login failed: ${err.message}`);
+            }
+            return;
+        }
         if (type === 'profile' && handle) {
             log.info(`Scraping Instagram profile: @${handle}`);
             try {
@@ -147,6 +139,13 @@ const crawler = new PlaywrightCrawler({
     },
 });
 const requests = [];
+// Login first so the session is authenticated before scraping
+if (igUsername && igPassword) {
+    requests.push({
+        url: 'https://www.instagram.com/accounts/login/',
+        userData: { type: 'login' },
+    });
+}
 if (mode === 'account_tracking' || mode === 'both') {
     for (const handle of handles) {
         requests.push({
