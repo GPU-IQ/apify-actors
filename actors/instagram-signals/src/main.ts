@@ -48,8 +48,8 @@ const crawler = new PlaywrightCrawler({
   proxyConfiguration,
   useSessionPool: true,
   persistCookiesPerSession: true,
-  maxConcurrency: 2,
-  navigationTimeoutSecs: 40,
+  maxConcurrency: 1,
+  navigationTimeoutSecs: 60,
   requestHandlerTimeoutSecs: 120,
 
   launchContext: {
@@ -74,16 +74,30 @@ const crawler = new PlaywrightCrawler({
         timeout: 30_000,
       });
 
-      // Dismiss cookie/consent dialog
+      // Log page state for debugging
+      await page.waitForTimeout(2_000);
+      log.info(`Login page URL: ${page.url()}`);
+      log.info(`Login page title: ${await page.title()}`);
+
+      // Dismiss cookie/consent dialog — try all common variants
       for (const sel of [
         'button:has-text("Allow all cookies")',
         'button:has-text("Accept all")',
         'button:has-text("Allow essential and optional cookies")',
+        'button:has-text("Accept")',
         '[data-cookiebanner="accept_button"]',
+        'button[class*="accept"]',
+        '._a9--._ap36._a9_1',  // Instagram-specific consent button class
       ]) {
-        try { await page.locator(sel).first().click({ timeout: 4_000 }); break; }
-        catch { /* try next */ }
+        try {
+          await page.locator(sel).first().click({ timeout: 3_000 });
+          log.info(`Clicked consent button: ${sel}`);
+          await page.waitForTimeout(1_500);
+          break;
+        } catch { /* try next */ }
       }
+
+      log.info(`Post-consent URL: ${page.url()}`);
 
       try {
         await page.waitForSelector('input[name="username"]', { timeout: 20_000 });
@@ -94,9 +108,12 @@ const crawler = new PlaywrightCrawler({
           url => !url.toString().includes('/accounts/login'),
           { timeout: 25_000 },
         ).catch(() => { /* challenge — session may still work */ });
-        log.info('Instagram login completed');
+        log.info(`Login done, now at: ${page.url()}`);
       } catch (err) {
         log.warning(`Instagram login failed: ${(err as Error).message}`);
+        // Log visible text to understand what page is showing
+        const bodyText = await page.evaluate(() => document.body.innerText.slice(0, 500)).catch(() => '');
+        log.warning(`Page content: ${bodyText}`);
       }
       return;
     }

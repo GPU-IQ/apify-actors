@@ -175,9 +175,10 @@ export async function scrapeHashtag(page, hashtag, maxResults) {
     };
     page.on('response', onResponse);
     await page.goto(`https://www.instagram.com/explore/tags/${hashtag}/`, {
-        waitUntil: 'networkidle',
+        waitUntil: 'domcontentloaded',
         timeout: 30_000,
     });
+    await page.waitForTimeout(3_000); // let API calls fire after DOM loads
     page.off('response', onResponse);
     return results.slice(0, maxResults);
 }
