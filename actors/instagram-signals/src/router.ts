@@ -111,7 +111,7 @@ export async function loginIfNeeded(page: Page): Promise<boolean> {
 
   // Wait for redirect away from login page
   try {
-    await page.waitForURL(url => !url.includes('/accounts/login'), { timeout: 20_000 });
+    await page.waitForURL(url => !url.toString().includes('/accounts/login'), { timeout: 20_000 });
   } catch { /* may stay on login if challenge required */ }
 
   return true;

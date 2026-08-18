@@ -75,17 +75,30 @@ export async function loginIfNeeded(page) {
     if (!username || !password)
         return false;
     await page.goto('https://www.instagram.com/accounts/login/', {
-        waitUntil: 'networkidle',
+        waitUntil: 'domcontentloaded',
         timeout: 30_000,
     });
+    // Dismiss GDPR / cookie consent dialog if present
+    try {
+        const consentBtn = page.locator('button:has-text("Allow all cookies"), button:has-text("Accept all"), button:has-text("Allow essential and optional cookies")').first();
+        await consentBtn.click({ timeout: 6_000 });
+        await page.waitForTimeout(1_000);
+    }
+    catch { /* no consent dialog — continue */ }
     // Check if already logged in
     const isLoggedIn = await page.evaluate(() => document.cookie.includes('sessionid'));
     if (isLoggedIn)
         return true;
+    // Wait for and fill login form
+    await page.waitForSelector('input[name="username"]', { timeout: 15_000 });
     await page.fill('input[name="username"]', username);
     await page.fill('input[name="password"]', password);
     await page.click('button[type="submit"]');
-    await page.waitForNavigation({ waitUntil: 'networkidle', timeout: 20_000 });
+    // Wait for redirect away from login page
+    try {
+        await page.waitForURL(url => !url.toString().includes('/accounts/login'), { timeout: 20_000 });
+    }
+    catch { /* may stay on login if challenge required */ }
     return true;
 }
 export async function scrapeProfile(page, handle, maxPosts) {
