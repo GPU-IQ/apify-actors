@@ -100,9 +100,22 @@ const crawler = new PlaywrightCrawler({
       log.info(`Post-consent URL: ${page.url()}`);
 
       try {
-        await page.waitForSelector('input[name="username"]', { timeout: 20_000 });
-        await page.fill('input[name="username"]', igUsername!);
-        await page.fill('input[name="password"]', igPassword!);
+        // Try multiple selectors — Instagram changes input attributes frequently
+        const userInput = page.locator([
+          'input[name="username"]',
+          'input[aria-label*="username" i]',
+          'input[aria-label*="Mobile number" i]',
+          'input[type="text"]',
+        ].join(', ')).first();
+        await userInput.waitFor({ state: 'attached', timeout: 20_000 });
+        await userInput.fill(igUsername!);
+
+        const passInput = page.locator([
+          'input[name="password"]',
+          'input[aria-label*="password" i]',
+          'input[type="password"]',
+        ].join(', ')).first();
+        await passInput.fill(igPassword!);
         await page.click('button[type="submit"]');
         await page.waitForURL(
           url => !url.toString().includes('/accounts/login'),
