@@ -116,7 +116,12 @@ const crawler = new PlaywrightCrawler({
           'input[type="password"]',
         ].join(', ')).first();
         await passInput.fill(igPassword!);
-        await page.click('button[type="submit"]');
+        const submitBtn = page.locator([
+          'button[type="submit"]',
+          'button:has-text("Log in")',
+          'button:has-text("Log In")',
+        ].join(', ')).first();
+        await submitBtn.click({ timeout: 10_000 });
         await page.waitForURL(
           url => !url.toString().includes('/accounts/login'),
           { timeout: 25_000 },
